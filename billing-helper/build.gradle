@@ -17,12 +17,13 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
     namespace 'com.hamurcuabi.billinghelper'
 }
 
 dependencies {
 
-   def billing_version = '5.2.0'
+   def billing_version = '6.0.0'
    def appcompat_version = '1.6.1'
    def lifecycle_version = '2.2.0'
    def lifecycle_runtime_version = '2.6.1'
