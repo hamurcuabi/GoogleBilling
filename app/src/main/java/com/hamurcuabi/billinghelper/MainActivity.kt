@@ -27,7 +27,13 @@ class MainActivity : AppCompatActivity() {
             consumableKeys = consumablesList,
             subscriptionKeys = subsList,
             key = "LICENSE KEY",
-            enableLogging = true
+            enableLogging = true,
+            billingErrorListener = object : BillingErrorListener {
+                override fun onBillingError(result: BillingResponseCode) {
+                    TODO("Not yet implemented")
+                }
+
+            }
         )
 
         iapConnector.addBillingClientConnectionListener(object : BillingClientConnectionListener {

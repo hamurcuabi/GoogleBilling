@@ -20,15 +20,23 @@ class IapConnector @JvmOverloads constructor(
     nonConsumableKeys: List<String> = emptyList(),
     consumableKeys: List<String> = emptyList(),
     subscriptionKeys: List<String> = emptyList(),
+    billingErrorListener: BillingErrorListener,
     key: String? = null,
-    enableLogging: Boolean = false
+    enableLogging: Boolean = false,
 ) {
 
     private var mBillingService: IBillingService? = null
 
     init {
         val contextLocal = context.applicationContext ?: context
-        mBillingService = BillingService(contextLocal, nonConsumableKeys, consumableKeys, subscriptionKeys)
+        mBillingService =
+            BillingService(
+                context = contextLocal,
+                nonConsumableKeys = nonConsumableKeys,
+                consumableKeys = consumableKeys,
+                subscriptionSkuKeys = subscriptionKeys,
+                billingErrorListener = billingErrorListener
+            )
         getBillingService().init(key)
         getBillingService().enableDebugLogging(enableLogging)
     }

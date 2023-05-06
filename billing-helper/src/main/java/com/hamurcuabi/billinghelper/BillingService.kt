@@ -28,7 +28,8 @@ class BillingService(
     private val context: Context,
     private val nonConsumableKeys: List<String>,
     private val consumableKeys: List<String>,
-    private val subscriptionSkuKeys: List<String>
+    private val subscriptionSkuKeys: List<String>,
+    private val billingErrorListener: BillingErrorListener
 ) : IBillingService(), PurchasesUpdatedListener, AcknowledgePurchaseResponseListener {
 
     private lateinit var mBillingClient: BillingClient
@@ -171,25 +172,9 @@ class BillingService(
                 processPurchases(purchases)
             }
 
-            BillingClient.BillingResponseCode.USER_CANCELED ->
-                log("onPurchasesUpdated: User canceled the purchase")
-
-            BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED -> {
-                log("onPurchasesUpdated: The user already owns this item")
-                //item already owned? call queryPurchases to verify and process all such items
-                GlobalScope.launch {
-                    queryPurchases()
-                }
+            else -> {
+                billingErrorListener.onBillingError(BillingResponseCode.fromCode(responseCode))
             }
-
-            BillingClient.BillingResponseCode.DEVELOPER_ERROR ->
-                Log.e(
-                    TAG, "onPurchasesUpdated: Developer error means that Google Play " +
-                            "does not recognize the configuration. If you are just getting started, " +
-                            "make sure you have configured the application correctly in the " +
-                            "Google Play Console. The SKU product ID must match and the APK you " +
-                            "are using must be signed with release keys."
-                )
         }
     }
 
@@ -224,9 +209,8 @@ class BillingService(
                                             }
 
                                             else -> {
-                                                Log.d(
-                                                    TAG,
-                                                    "Handling consumables : Error during consumption attempt -> ${billingResult.debugMessage}"
+                                                billingErrorListener.onBillingError(
+                                                    BillingResponseCode.fromCode(billingResult.responseCode)
                                                 )
                                             }
                                         }
